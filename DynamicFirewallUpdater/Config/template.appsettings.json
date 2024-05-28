@@ -1,0 +1,59 @@
+{
+  "Azure": {
+    "Directories": [
+      {
+        // First Directory - say my own
+        "Id": "<Directory 1 Guid>",
+        "ServicePrincipal": {
+          "Id": "<Service Principal Guid in Directory 1>", // add this as an App Registration the Azure Portal for Entra - https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps
+          "CertificateThumbprint": "<Thumbprint of my public certificate uploaded to Azure App Registration>" // You'll need either a Certificate or a Secret in the App Registration, ideally a different one for each user.
+        },
+        "Subscriptions": [
+          {
+            "Id": "<Subscription 1 Guid in Directory 1>",
+            "ResourceGroups": [
+              {
+                "Name": "<Resource Group Name in Subscription 1>",
+                "SqlServers": [
+                  "<Server name>"
+                ]
+              }
+            ]
+          },
+          {
+            "Id": "<Subscription 2 Guid in Directory 1>",
+            "ResourceGroups": [
+              {
+                "Name": "<Resource Group Name in Subscription 2>",
+                "SqlServers": [
+                  "<Other server name>"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        // My client's tenant
+        "Id": "<Directory 2 Guid>",
+        "ServicePrincipal": {
+          "Id": "<Service Principal Guid in Directory 2>",
+          "Secret": "<Secret for this Service Principal>" // Microsoft recommend certificates over app Secrets
+        },
+        "Subscriptions": [
+          {
+            "Id": "<Subscription 1 Guid in Directory 2>",
+            "ResourceGroups": [
+              {
+                "Name": "<Resource Group Name>",
+                "SqlServers": [
+                  "<Their Server Name>"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
