@@ -1,9 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFirewallUpdater", "DynamicFirewallUpdater\DynamicFirewallUpdater.csproj", "{C3D14843-1477-48E3-AB03-9A807B09348F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicFirewallUpdater", "DynamicFirewallUpdater\DynamicFirewallUpdater.csproj", "{C3D14843-1477-48E3-AB03-9A807B09348F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{9EDA6FF6-B9E5-4803-8854-77FC8FDD3BAF}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Certificate Generator.ps1 = Certificate Generator.ps1
+		LICENSE = LICENSE
+		README.md = README.md
+		Update Azure Firewalls Scheduled Task.xml = Update Azure Firewalls Scheduled Task.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
