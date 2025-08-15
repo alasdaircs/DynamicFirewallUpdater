@@ -31,6 +31,7 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 					if( certs.Count == 1 )
 					{
 						certificate = certs[0];
+						break;
 					}
 				}
 

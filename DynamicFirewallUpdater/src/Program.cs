@@ -32,8 +32,8 @@ namespace ACSSolutions.DynamicFirewallUpdater
 			public const String DefaultsFile
 				= "appsettings.json";
 
-			public const String OverlayFileName
-				= "appsettings.json";
+			public static String OverlayFileName
+				=> $"appsettings.{Environment.MachineName}.json";
 
 			public static String OverlayFilePath
 			{

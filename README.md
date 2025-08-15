@@ -1,6 +1,6 @@
 ﻿# Dynamic SQL Azure Firewall Updater
 
-This project is intended toi help the itinerant developer who need to connect to an Azure SQL Database from multiple locations and/or dynamic IP addresses
+This project is intended to help the itinerant developer who need to connect to an Azure SQL Database from multiple locations and/or dynamic IP addresses
 
 The basic idea is to have just one entry for your PC on the firewalls of all the Azure SQL Servers to which you need to connect, and to run a scheduled task frequently to use the API to update the IP address of the firewall rule in necessary.
 
@@ -16,7 +16,8 @@ In the [Azure Portal](https://portal.azure.com/) go to the [Entra ID blade](http
 I put the binaries in "C:\Program Files\ACS Solutions\DynamicFirewallUpdater\bin".
 
 ## Configuration
-The app reads configuration from appsettings.json in its own folder, and also from ..\config\appsettings.json, so you can keep your configuration away from the binary deployment folder.
+The app reads configuration from appsettings.json in its own folder, and also from ..\config\appsettings.\{MachineName\}.json, so you can keep your configuration away from the binary deployment folder. 
+Including the machine name means you can have multiple machines refer to the same shared folder but receive different configurations.
 Review the template.appsettings.json in the Config folder, and then create your own, plugging in all the guids and names from the Azure Portal.
 
 ## Prerequisites
