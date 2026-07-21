@@ -6,6 +6,6 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 {
 	public class Azure
 	{
-		public List<Directory> Directories { get; set; }
+		public List<Directory> Directories { get; set; } = null!;
 	}
 }

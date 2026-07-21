@@ -11,8 +11,8 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 	public class Directory
 	{
 		public Guid Id { get; set; }
-		public ServicePrincipal ServicePrincipal { get; set; }
-		public List<Subscription> Subscriptions { get; set; }
+		public ServicePrincipal ServicePrincipal { get; set; } = null!;
+		public List<Subscription> Subscriptions { get; set; } = null!;
 
 		public TokenCredential GetCredential( Guid tenantId )
 		{
@@ -20,7 +20,7 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 
 			if( !String.IsNullOrWhiteSpace( ServicePrincipal.CertificateThumbprint ) )
 			{
-				X509Certificate2 certificate = null;
+				X509Certificate2? certificate = null;
 				foreach( var storeLocation in new[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine } )
 				{
 					X509Store store = new X509Store( storeLocation );
@@ -51,7 +51,7 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 				result = new ClientSecretCredential(
 					Id.ToString(),
 					ServicePrincipal.Id.ToString(),
-					ServicePrincipal.Secret
+					ServicePrincipal.Secret!
 				);
 			}
 			else

@@ -10,7 +10,7 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 {
 	public class Settings
 	{
-		public CGNAT CGNAT { get; set; }
-		public Azure Azure { get; set; }
+		public CGNAT CGNAT { get; set; } = null!;
+		public Azure Azure { get; set; } = null!;
 	}
 }

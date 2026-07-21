@@ -7,7 +7,7 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 {
 	public class ResourceGroup
 	{
-		public String Name { get; set; }
-		public List<String> SqlServers { get; set; }
+		public String Name { get; set; } = null!;
+		public List<String> SqlServers { get; set; } = null!;
 	}
 }

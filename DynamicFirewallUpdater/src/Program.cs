@@ -120,7 +120,8 @@ namespace ACSSolutions.DynamicFirewallUpdater
 			}
 			#endif
 
-			var settings = configuration.Get<Settings.Settings>();
+			var settings = configuration.Get<Settings.Settings>()
+				?? throw new InvalidOperationException( "Failed to bind application settings." );
 			var validationCtx = new ValidationContext( settings );
 			var validationResults = new List<ValidationResult>();
 			var valid = new RecursiveDataAnnotationValidator().TryValidateObjectRecursive( settings, validationCtx, validationResults );

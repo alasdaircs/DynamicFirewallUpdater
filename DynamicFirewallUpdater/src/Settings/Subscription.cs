@@ -7,6 +7,6 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 	public class Subscription
 	{
 		public Guid Id { get; set; }
-		public List<ResourceGroup> ResourceGroups { get; set; }
+		public List<ResourceGroup> ResourceGroups { get; set; } = null!;
 	}
 }
