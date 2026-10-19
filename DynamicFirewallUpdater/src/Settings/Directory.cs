@@ -21,7 +21,16 @@ namespace ACSSolutions.DynamicFirewallUpdater.Settings
 			if( !String.IsNullOrWhiteSpace( ServicePrincipal.CertificateThumbprint ) )
 			{
 				X509Certificate2? certificate = null;
-				foreach( var storeLocation in new[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine } )
+
+				// On Unix the LocalMachine store only exposes Root and CertificateAuthority,
+				// so opening it for a client certificate throws PlatformNotSupportedException
+				// rather than simply finding nothing. CurrentUser is the only usable store
+				// off Windows.
+				var storeLocations = OperatingSystem.IsWindows()
+					? new[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine }
+					: new[] { StoreLocation.CurrentUser };
+
+				foreach( var storeLocation in storeLocations )
 				{
 					X509Store store = new X509Store( storeLocation );
 					store.Open( OpenFlags.ReadOnly );

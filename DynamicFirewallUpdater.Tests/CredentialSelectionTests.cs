@@ -45,13 +45,9 @@ namespace ACSSolutions.DynamicFirewallUpdater.Tests
 		[Fact]
 		public void A_Thumbprint_Takes_Precedence_And_Does_Not_Fall_Back_To_The_Secret()
 		{
-			// Windows only. GetCredential opens the LocalMachine store unguarded, and on
-			// Unix that throws PlatformNotSupportedException ("limited to the Root and
-			// CertificateAuthority stores") before it can report the certificate missing.
-			// The app is deployed as a Windows scheduled task, so CI runs this for real;
-			// this skip only keeps the suite green for anyone working on Linux or macOS.
-			Assert.SkipUnless( OperatingSystem.IsWindows(), "X509Store LocalMachine is Windows-only" );
-
+			// Runs on every platform: GetCredential searches LocalMachine only on Windows,
+			// because the Unix LocalMachine store exposes just Root and CertificateAuthority
+			// and throws when opened for a client certificate.
 			// A thumbprint that resolves to no certificate must fail loudly. Silently using
 			// the secret instead would mask a broken certificate deployment indefinitely.
 			var directory = DirectoryWith(

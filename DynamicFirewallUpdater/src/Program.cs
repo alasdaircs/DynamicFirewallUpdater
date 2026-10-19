@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -94,6 +95,17 @@ namespace ACSSolutions.DynamicFirewallUpdater
 
 			var configuration = configurationBuilder.Build();
 
+			// Windows expands %TEMP% in the sink path; Unix does not, and would create a
+			// file named literally "%TEMP%\\..." beside the executable.
+			var logPaths = ResolveWindowsLogPaths( configuration );
+			if( logPaths.Count > 0 )
+			{
+				configuration = new ConfigurationBuilder()
+					.AddConfiguration( configuration )
+					.AddInMemoryCollection( logPaths )
+					.Build();
+			}
+
 			Log.Logger = new LoggerConfiguration()
 				.ReadFrom.Configuration( configuration )
 				.CreateLogger();
@@ -177,6 +189,60 @@ namespace ACSSolutions.DynamicFirewallUpdater
 		);
 
 		/// <summary>
+		/// Serilog file-sink paths that need rewriting for the running platform, keyed by
+		/// their configuration key. Empty on Windows, where %TEMP% and backslash separators
+		/// are already understood.
+		/// </summary>
+		internal static Dictionary<String, String?> ResolveWindowsLogPaths( IConfiguration configuration )
+		{
+			if( OperatingSystem.IsWindows() )
+			{
+				return new Dictionary<String, String?>();
+			}
+
+			return configuration.AsEnumerable()
+				.Where( entry => entry.Key.StartsWith( "Serilog:WriteTo:", StringComparison.Ordinal ) )
+				.Where( entry => entry.Key.EndsWith( ":Args:path", StringComparison.Ordinal ) )
+				.Where( entry => entry.Value?.Contains( "%TEMP%", StringComparison.OrdinalIgnoreCase ) == true )
+				.ToDictionary(
+					entry => entry.Key,
+					entry => (String?)Path.Combine(
+						Path.GetTempPath(),
+						entry.Value!
+							.Replace( "%TEMP%", "", StringComparison.OrdinalIgnoreCase )
+							.Replace( '\\', Path.DirectorySeparatorChar )
+							.TrimStart( Path.DirectorySeparatorChar )
+					)
+				);
+		}
+
+		/// <summary>
+		/// Whether a ping to <paramref name="ip"/> with a deliberately low TTL fails to
+		/// come back, which is taken as a sign of a carrier-grade NAT in the path.
+		/// </summary>
+		/// <remarks>
+		/// Raw ICMP sockets need root or CAP_NET_RAW on Linux; without either, .NET falls
+		/// back to the ping utility, and on a host with no such binary the probe cannot run
+		/// at all. Where it cannot run we report no CGNAT rather than failing the run:
+		/// widening the firewall to a whole subnet on the strength of a test we were unable
+		/// to perform would open addresses we have no evidence of needing.
+		/// </remarks>
+		internal static Boolean IsBehindCgnat( String ip, Byte ttl )
+		{
+			try
+			{
+				var options = new PingOptions() { Ttl = ttl };
+				var response = new Ping().Send( IPAddress.Parse( ip ), 30, PingBuffer.Value, options );
+				return response.Status != IPStatus.Success;
+			}
+			catch( Exception e ) when ( e is PlatformNotSupportedException or SocketException or PingException )
+			{
+				Log.Warning( e, "CGNAT probe could not run - treating {0} as non-CGNAT", ip );
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// The usable address range of the subnet of <paramref name="ip"/> at
 		/// <paramref name="subnetLength"/> bits. Widening the firewall entry to the whole
 		/// subnet is what lets a CGNAT session keep working when it re-sources from a
@@ -198,10 +264,7 @@ namespace ACSSolutions.DynamicFirewallUpdater
 
 			// We try to automatically detect CGNAT from e.g. mobile networks, because it often sources from different IP addresses in a range in a single session.
 			// It's also safe to expand the firewall range because CGNAT prevents any inbound connections.
-			var ping = new Ping();
-			var options = new PingOptions() { Ttl = _settings.CGNAT.TTL };
-			var response = ping.Send( IPAddress.Parse( ipStart ), 30, PingBuffer.Value, options );
-			var cgnat = response.Status != IPStatus.Success;
+			var cgnat = IsBehindCgnat( ipStart, _settings.CGNAT.TTL );
 
 			if( cgnat )
 			{
