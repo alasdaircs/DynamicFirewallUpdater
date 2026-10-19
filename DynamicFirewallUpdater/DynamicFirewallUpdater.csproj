@@ -16,6 +16,13 @@
 	  <None Remove="Config\appSettings.json" />
 	</ItemGroup>
 
+	<!-- Expose internals to the test project -->
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>DynamicFirewallUpdater.Tests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Azure.Identity" Version="1.21.0" />
 		<PackageReference Include="Azure.ResourceManager" Version="1.14.0" />

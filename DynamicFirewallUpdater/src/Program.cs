@@ -176,6 +176,19 @@ namespace ACSSolutions.DynamicFirewallUpdater
 			}
 		);
 
+		/// <summary>
+		/// The usable address range of the subnet of <paramref name="ip"/> at
+		/// <paramref name="subnetLength"/> bits. Widening the firewall entry to the whole
+		/// subnet is what lets a CGNAT session keep working when it re-sources from a
+		/// different address in the same range.
+		/// </summary>
+		internal static ( String Start, String End ) CgnatRange( String ip, Byte subnetLength )
+		{
+			var host = IPAddress.Parse( ip );
+			var network = IPNetwork2.Parse( host.ToString() + "/" + subnetLength.ToString() );
+			return ( network.FirstUsable.ToString(), network.LastUsable.ToString() );
+		}
+
 		private async Task Run( CancellationToken cancellation )
 		{
 			var ip = await "https://api.ipify.org".GetStringAsync( cancellationToken: cancellation );
@@ -192,10 +205,7 @@ namespace ACSSolutions.DynamicFirewallUpdater
 
 			if( cgnat )
 			{
-				var host = IPAddress.Parse( ipStart );
-				var network = IPNetwork2.Parse( host.ToString() + "/" + _settings.CGNAT.SubnetLength.ToString() );
-				ipStart = network.FirstUsable.ToString();
-				ipEnd = network.LastUsable.ToString();
+				( ipStart, ipEnd ) = CgnatRange( ipStart, _settings.CGNAT.SubnetLength );
 				Log.Debug( "CGNAT detected - Setting ipStart={0} and ipEnd={1}", ipStart, ipEnd );
 			}
 

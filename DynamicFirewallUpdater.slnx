@@ -2,10 +2,12 @@
   <Folder Name="/Other/">
     <File Path=".gitattributes" />
     <File Path=".gitignore" />
+    <File Path="global.json" />
     <File Path="Certificate Generator.ps1" />
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path="Update Azure Firewalls Scheduled Task.xml" />
   </Folder>
   <Project Path="DynamicFirewallUpdater/DynamicFirewallUpdater.csproj" />
+  <Project Path="DynamicFirewallUpdater.Tests/DynamicFirewallUpdater.Tests.csproj" />
 </Solution>

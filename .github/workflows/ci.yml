@@ -1,0 +1,43 @@
+name: CI
+
+# windows-latest matches where this runs in production (a scheduled task), and it is the
+# only platform where the certificate branch of Directory.GetCredential can be exercised:
+# on Unix the LocalMachine X509Store throws rather than reporting a missing certificate.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Restore
+        run: dotnet restore DynamicFirewallUpdater.slnx
+
+      - name: Build
+        run: dotnet build DynamicFirewallUpdater.slnx --no-restore -c Release
+
+      - name: Test
+        run: dotnet test --solution DynamicFirewallUpdater.slnx --no-restore -c Release
+
+      - name: Publish (win-x64 self-contained)
+        run: dotnet publish DynamicFirewallUpdater/DynamicFirewallUpdater.csproj -r win-x64 --self-contained -c Release --no-restore -o publish/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: DynamicFirewallUpdater-win-x64
+          path: publish/
+          if-no-files-found: error
